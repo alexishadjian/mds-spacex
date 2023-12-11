@@ -1,108 +1,28 @@
 const Launch = require('../models/launchModel');
-const launchApiProvider = require('../providers/launchApiProvider');
+const launchProvider = require('../providers/launchProvider')
 
-exports.listAllLaunch = async (req, res) => {
-    
+exports.listAllLaunches = async(req, res) =>{
     try {
-        // const response = await fetch('https://api.spacexdata.com/v4/launches');
-        // const launches = await response.json();
-    
-        // res.json(launches);
-
-        // let newPost = new Post(req.body);
-        
-        let launchesPromise = launchApiProvider.getLaunches();
-        let response = await launchesPromise;
-
-        // if ( !newPost.content ) {
-        //     newPost.content = response;
-        // }
-
-        res.json(response);
-
-
-        // let post = await newPost.save();
-        // res.status(201).json(post);
+        const launches = await Launch.find({});
+        res.status(201).json(launches);
     } catch (error) {
-        console.error('Erreur', error);
-        res.status(500).json({ error: 'Erreur' });
+        console.log(error);
+        res.status(500).json({message : 'Erreur serveur'});
     }
-    
 }
 
-exports.createAPost = async (req, res) => {
 
-    // const newPost = new Post(req.body);
-    
-    // try {
-    //     const post = await newPost.save();
-    //     res.status(201);
-    //     res.json(post);
-    // } catch (error) {
-    //     res.status(500);
-    //     console.log(error);
-    //     res.json({message: 'Erreur serveur'})
-    // }
-
+exports.createLaunch = async(req, res) =>{
     try {
-        let newPost = new Post(req.body);
-        
-        let randomTextPromise = textApiProvider.getRandomText();
-        let response = await randomTextPromise;
+        const launches = launchProvider.getAllLaunches();
+        const response = await launches;
 
-        if ( !newPost.content ) {
-            newPost.content = response;
-        }
+        for( let i = 0; i < response.length; i++ ) new Launch(response[i]).save();
 
-        let post = await newPost.save();
-        res.status(201).json(post);
+        res.status(201).json({message : 'ok'});
 
     } catch (error) {
-        console.error(error);
-        res.status(401).json({message: "requete invalide"});
-    }
-}
-
-exports.updateAPost = async (req, res) => {
-
-    try {
-        const post = await Post.findByIdAndUpdate(req.params.id_post, req.body, {new: true});
-        res.status(200);
-        res.json(post);
-    } catch (error) {
-        res.status(500);
         console.log(error);
-        res.json({message: 'erreur serveur'});
+        res.status(500).json({message : 'Erreur serveur'});
     }
-
-}
-
-exports.deleteAPost = async (req, res) => {
-    
-    try {
-        await Post.findByIdAndDelete(req.params.id_post);
-        res.status(200);
-        res.json({message: 'Article supprimé'});
-
-    } catch {
-        res.status(500);
-        console.log(error);
-        res.json({message: 'erreur serveur'});
-    }
-
-}
-
-exports.getAPost = async (req, res) => {
-    
-    try {
-        const post = await Post.findById(req.params.id_post);
-        res.status(200);
-        res.json(post);
-
-    } catch {
-        res.status(500);
-        console.log(error);
-        res.json({message: 'erreur serveur'});
-    }
-
 }
